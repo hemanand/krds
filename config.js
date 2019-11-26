@@ -2,12 +2,12 @@ var config = {
 	database: {
 		host:	  'localhost', 	
 		user: 	  'root', 		
-		password: 'P@ssword_001', 		
+		password: '', 		
 		port: 	  3306, 		
 		db: 	  'test' 		
 	},
 	server: {
-		host: '127.0.0.1',
+		host: '52.91.29.48',
 		port: '3000'
 	}
 }
