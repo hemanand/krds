@@ -64,7 +64,7 @@ app.use('/users', users)
 passport.use(new FacebookStrategy({
     clientID: '689267631222462',
     clientSecret: '434cce4e6566664d260de3743de491fe',
-    callbackURL: "https://hemanand.herokuapp.com/users/"
+    callbackURL: "http://52.91.29.48/users/"
   },
   function(accessToken, refreshToken, profile, cb) {
   	app.use('/users', users);
@@ -76,5 +76,5 @@ process.on('uncaughtException', function (err) {
 })
 
 app.listen(80, function(){
-	console.log('Server running at port 80: https://hemanand.herokuapp.com/')
+	console.log('Server running at port 80: https://52.91.29.48/')
 })
