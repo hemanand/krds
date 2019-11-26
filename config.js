@@ -7,7 +7,7 @@ var config = {
 		db: 	  'test' 		
 	},
 	server: {
-		host: '52.91.29.48',
+		host: '127.0.0.1',
 		port: '3000'
 	}
 }
