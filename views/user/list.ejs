@@ -1,0 +1,223 @@
+<!--
+including header content which is common for all pages
+-->
+<%- include ../layouts/header.ejs %>
+
+<body ng-controller="applicationcontroller">
+<div class="container">
+            <a href="/" class="btn btn-success">Home</a> | 
+            <a href="/users/add" class="btn btn-success">Add New Book</a> | 
+            <a href="/users" class="btn btn-success">All Users Book List</a>
+            <h1><%= title %></h1>
+</div>
+<% if (messages.error) { %>
+	<p style="color:red"><%- messages.error %></p>
+<% } %>
+
+<% if (messages.success) { %>
+	<p style="color:green"><%- messages.success %></p>
+<% } %>	
+
+<div class="container">
+    <h3 class="pagination pull-right">Pagination</h3>
+    <br/>
+    <br/>
+	<div class="pagination pull-right pagi_master" ng-if="pagenos.length > 1 "> 
+	                            <ul>
+	                                <li ng-class="{disabled: currentPage == 0}">
+	                                    <a href ng-click="prevPage()">« Prev</a>
+	                                </li>
+	                                <li ng-repeat="n in pagenos | limitTo:5"
+	                                    ng-class="{active: n == currentPage}"
+	                                ng-click="setPage()">
+	                                    <a href ng-bind="n + 1">1</a>
+	                                </li>
+	                                <li ng-class="{disabled: currentPage == pagedItems.length - 1}">
+	                                    <a href ng-click="nextPage()">Next »</a>
+	                                </li>
+	                            </ul>
+	                      </div>
+	<table class="table table-striped" border="1">
+		<tr>
+			<th>Title</th>
+			<th>ISBN</th>
+			<th>PublishedDate</th>
+			<th>ShortDescription</th>
+			<th>Status</th>
+			<th>Authors</th>
+			<th>Categories</th>
+            <th>Edit</th>
+		</tr>
+        <tr>
+            <th><input type="text" placeholder="Search Title" ng-model="title_query" ng-change="title_search()" class="titlesearch"></th>
+            <th><input type="text" placeholder="Search ISBN" ng-model="isbn_query" ng-change="isbn_search()" class="inputsearch"></th>
+            <th><!-- <input type="text" ng-model="publisheddate_query" ng-change="publisheddate_search()" class="publisheddatesearch"> --></th>
+            <th><!-- <input type="text" ng-model="shortdesc_query" ng-change="shortdesc_search()" class="shortdescsearch"> --></th>
+            <th><!-- <input type="text" ng-model="status_query" ng-change="status_search()" class="statussearch"> --></th>
+            <th><!-- <input type="text" ng-model="authros_query" ng-change="authros_search()" class="authorssearch"> --></th>
+            <th><!-- <input type="text" ng-model="categories_query" ng-change="categories_search()" class="categoriessearch"> --></th>
+            <th></th>
+        </tr>
+
+		<tr style='text-align:left; background-color:#CCC' ng-repeat="data in pagedItems[currentPage]"">
+			<td>{{data.title}}</td>
+			<td>{{data.isbn}}</td>
+			<td>{{data.publishedDate}}</td>
+			<td>{{data.shortDescription}}</td>
+			<td>{{data.status}}</td>
+			<td>{{data.authors}}</td>
+			<td>{{data.categories}}</td>
+            <td><a href="http://127.0.0.1:3000/users/edit/{{data.isbn}}">Edit</a></td>
+		</tr>
+	</table>
+	</div>
+</body>
+<!--
+including footer content which is common for all pages
+-->
+<%- include ../layouts/footer.ejs %>
+<script>
+var app = angular.module('myapplication', []);
+app.controller('applicationcontroller', function($scope, $http, $timeout,$window,$filter,$element) {
+  $http.get("http://127.0.0.1:3000/users/booklist")
+  .then(function (response) {
+  		$scope.sortingOrder = '';
+        $scope.reverse = false;
+        $scope.filteredItems = [];
+        $scope.groupedItems = [];
+        $scope.itemsPerPage = 10;
+        $scope.pagedItems = [];
+        $scope.pagenos = [];
+        $scope.currentPage = 0;
+		var data = response.data;   		
+        $scope.tot_items = data;
+         var searchMatch = function (haystack, needle) {
+                        if (!needle) {
+                            return true;
+                        }
+                        if(haystack !== null){
+                            return haystack.toString().toLowerCase().indexOf(needle.toString().toLowerCase());
+                        }
+                };
+
+                $scope.search = function () {
+                    $scope.filteredItems = $filter('filter')($scope.tot_items, function (item) {
+                        for(var attr in item) {
+                            if (searchMatch(item[attr], $scope.query))
+                                return true;
+                        }
+                        return false;
+                    });
+                     $scope.reverse = true;
+                    if ($scope.sortingOrder !== '') {
+                        $scope.filteredItems = $filter('orderBy')($scope.filteredItems, $scope.sortingOrder, $scope.reverse);
+                    }
+                    $scope.currentPage = 0;
+                    $scope.groupToPages();
+                    $scope.range($scope.pagedItems.length);
+                };
+
+                $scope.title_search = function () {
+                $scope.filteredItems = $filter('filter')($scope.tot_items, function (item) {
+                    for(var attr in item) {
+                        if(attr == "title") {
+                            if (searchMatch(item[attr], $scope.title_query) > -1){
+                            return true;
+                            }
+                        }
+                    }
+                return false;
+                });
+                if ($scope.sortingOrder !== '') {
+                $scope.filteredItems = $filter('orderBy')($scope.filteredItems, $scope.sortingOrder, $scope.reverse);
+                }
+                $scope.currentPage = 0;
+                $scope.groupToPages();
+                $scope.range($scope.pagedItems.length);
+                };
+
+
+                $scope.isbn_search = function () {
+                $scope.filteredItems = $filter('filter')($scope.tot_items, function (item) {
+                    for(var attr in item) {
+                        if(attr == "isbn") {
+                            if (searchMatch(item[attr], $scope.isbn_query) > -1){
+                            return true;
+                            }
+                        }
+                    }
+                return false;
+                });
+                if ($scope.sortingOrder !== '') {
+                $scope.filteredItems = $filter('orderBy')($scope.filteredItems, $scope.sortingOrder, $scope.reverse);
+                }
+                $scope.currentPage = 0;
+                $scope.groupToPages();
+                $scope.range($scope.pagedItems.length);
+                };
+
+                $scope.groupToPages = function () {
+                    $scope.pagedItems = [];
+                    for (var i = 0; i < $scope.filteredItems.length; i++) {
+                        if (i % $scope.itemsPerPage === 0) {
+                            $scope.pagedItems[Math.floor(i / $scope.itemsPerPage)] = [ $scope.filteredItems[i] ];
+                        } else {
+                            $scope.pagedItems[Math.floor(i / $scope.itemsPerPage)].push($scope.filteredItems[i]);
+                        }
+                    }
+                };
+
+
+                $scope.range = function (start, end) {
+                    var ret = [];
+                    if (!end) {
+                        end = start;
+                        start = 0;
+                    }
+                    for (var i = start; i < end; i++) {
+                        ret.push(i);
+                    }
+                    $scope.pagenos = ret;
+                    return ret;
+                };
+
+                $scope.prevPage = function () {
+                    if ($scope.currentPage > 0) {
+                        $scope.currentPage--;
+                    }
+                };
+
+                $scope.nextPage = function () {
+                    if ($scope.currentPage < $scope.pagedItems.length - 1) {
+                        $scope.currentPage++;
+                    }
+                };
+
+                $scope.setPage = function () {
+                    $scope.currentPage = this.n;
+                };
+
+                $scope.search();
+
+                $scope.sort_by = function(propertyName) {
+                                $scope.sortKey = propertyName;   //set the sortKey to the param passed
+                                $scope.reverse = ($scope.sortKey === propertyName) ? !$scope.reverse : false;
+                                $scope.filteredItems = $filter('orderBy')($scope.filteredItems, $scope.sortKey, $scope.reverse);
+                                $scope.pagedItems = "";
+                                $scope.groupToPages();
+                    };
+
+                $scope.$watch('currentPage', function(pno,oldno){
+                  if ((pno+1)%6==0 && $scope.pagedItems.length > 6 ){
+                    var start = pno > oldno ? pno : (pno - 5 > 0 ? pno - 5 :0);    
+                    $scope.range(start, $scope.pagedItems.length);
+                  }else if ( pno%6!=0 && (oldno+1)%6==0 && $scope.pagedItems.length > 6){
+                    var start = pno > oldno ? oldno : (oldno - 5 > 0 ? oldno - 5 :0);
+                    $scope.range(start, $scope.pagedItems.length);
+                  }
+                });
+                $scope.range($scope.pagedItems.length);
+  });
+});
+</script>
+
