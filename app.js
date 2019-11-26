@@ -76,5 +76,5 @@ process.on('uncaughtException', function (err) {
 })
 
 app.listen(80, function(){
-	console.log('Server running at port 80: https://52.91.29.48/')
+	console.log('Server running at port 80: http://52.91.29.48/')
 })
