@@ -62,8 +62,8 @@ app.use('/', index)
 app.use('/users', users)
 
 passport.use(new FacebookStrategy({
-    clientID: '689267631222462',
-    clientSecret: '434cce4e6566664d260de3743de491fe',
+    clientID: '547987385994537',
+    clientSecret: 'bd13b5a52449a81ce39b80cddfd84238',
     callbackURL: "http://localhost:3000/users/"
   },
   function(accessToken, refreshToken, profile, cb) {
