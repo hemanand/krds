@@ -64,7 +64,7 @@ app.use('/users', users)
 passport.use(new FacebookStrategy({
     clientID: '689267631222462',
     clientSecret: '434cce4e6566664d260de3743de491fe',
-    callbackURL: "http://52.91.29.48/users/"
+    callbackURL: "http://52.91.29.48:3000/users/"
   },
   function(accessToken, refreshToken, profile, cb) {
   	app.use('/users', users);
@@ -75,6 +75,6 @@ process.on('uncaughtException', function (err) {
   console.log(err);
 })
 
-app.listen(80, function(){
-	console.log('Server running at port 80: http://52.91.29.48/')
+app.listen(3000, function(){
+	console.log('Server running at port 3000: http://52.91.29.48:3000/')
 })
